@@ -1,14 +1,9 @@
 package com;
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 
-import java.util.List;
-
 import com.Tree;
-import com.UI.Countdown;
 
 import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;

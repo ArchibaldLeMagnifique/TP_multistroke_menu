@@ -48,7 +48,7 @@ public class Tree<T> {
 			}
 		} else{
 			for (int i=0; i<this.getChildren().size(); i++) {
-				double angle = i * Math.PI/(this.getChildren().size()-1)-Math.PI/2-theta;
+				double angle = 0.7*(i * Math.PI/(this.getChildren().size()-1)-Math.PI/2)-theta*0.92;
 				double posX = X + Math.cos(angle)*140;
 				double posY = Y + Math.sin(angle)*80;
 				this.getChildren().get(i).dessine(X, Y, posX, posY);

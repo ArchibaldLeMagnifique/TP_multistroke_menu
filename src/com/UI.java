@@ -90,7 +90,7 @@ public class UI {
 		}
 		for (int i=0; i<currentTree.getChildren().size(); i++) {
 			if (currentTree.getChildren().get(i) == this.nextTree){
-				currentTree.getChildren().get(i).rect.setFill(new LinearGradient(0, 0, 0, 0.5, true, CycleMethod.NO_CYCLE, new Stop[] { new Stop(0, Color.web("#666666")), new Stop(1, Color.web("#aaaaaa"))}));
+				currentTree.getChildren().get(i).rect.setFill(new LinearGradient(0, 0, 0, 0.8, true, CycleMethod.NO_CYCLE, new Stop[] { new Stop(0, Color.web("#5b370b")), new Stop(1, Color.web("#ff9f2b"))}));
 			} else {
 				currentTree.getChildren().get(i).rect.setFill(Color.web("#dddddd"));
 			}
@@ -126,6 +126,7 @@ public class UI {
 		return Math.sqrt((x-x2)*(x-x2) + (y-y2)*(y-y2));
 	}
 
+	@SuppressWarnings("unused")
 	public Tree<String> generateTree() {
 		Tree<String> tree = new Tree<String>("", root);
 		Tree<String> childNode1 = new Tree<String>("Add Mesh", tree, root);
@@ -143,6 +144,8 @@ public class UI {
 		
 		Tree<String> childNode121 = new Tree<String>("Cube", childNode12, root);
 		Tree<String> childNode132 = new Tree<String>("UV Sphere", childNode12, root);
+		Tree<String> childNode123 = new Tree<String>("Cylinder", childNode12, root);
+		Tree<String> childNode134 = new Tree<String>("Torus", childNode12, root);
 		
 		
 		Tree<String> childNode21 = new Tree<String>("Inverse", childNode2, root);
