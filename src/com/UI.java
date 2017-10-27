@@ -4,7 +4,12 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -23,8 +28,10 @@ public class UI {
 
 	Tree<String> currentTree;
 	Tree<String> nextTree; //le noeud en gras
-	
+
 	Countdown cd;
+	
+	Text result;
 
 
 	public UI(Stage stage) {
@@ -32,13 +39,28 @@ public class UI {
 		stage.setTitle("TP multistroke menu");
 		root = new Group();
 		scene = new Scene(root, screenWidth, screenHeight);
+		scene.setFill(Color.web("#3b3b3b"));
 		stage.setScene(scene);
 		stage.show();
 		mousePos = new ArrayList<Line>();
+		result = new Text("Result: ");
+		result.setFont(Font.font ("Verdana", 25));
+		result.setFill(Color.WHITE);
+		result.setX(10);
+		result.setY(result.getLayoutBounds().getHeight());
+		root.getChildren().add(result);
 	}
 
 	public void reveilNode(Tree<String> tree, double X, double Y) {
-		tree.reveil(X, Y);
+		if (tree.isRoot()) {
+			tree.reveil(X, Y, 42);
+		} else {
+			if (tree.centerY-tree.parent.centerY < 0) {
+				tree.reveil(X, Y, Math.acos((tree.centerX-tree.parent.centerX)/distance(tree.centerX,tree.centerY,tree.parent.centerX,tree.parent.centerY)));
+			} else {
+				tree.reveil(X, Y, -Math.acos((tree.centerX-tree.parent.centerX)/distance(tree.centerX,tree.centerY,tree.parent.centerX,tree.parent.centerY)));
+			}
+		}
 		currentTree = tree;
 	}
 
@@ -68,15 +90,16 @@ public class UI {
 		}
 		for (int i=0; i<currentTree.getChildren().size(); i++) {
 			if (currentTree.getChildren().get(i) == this.nextTree){
-				currentTree.getChildren().get(i).rect.setStrokeWidth(3);
+				currentTree.getChildren().get(i).rect.setFill(new LinearGradient(0, 0, 0, 0.5, true, CycleMethod.NO_CYCLE, new Stop[] { new Stop(0, Color.web("#666666")), new Stop(1, Color.web("#aaaaaa"))}));
 			} else {
-				currentTree.getChildren().get(i).rect.setStrokeWidth(0);
+				currentTree.getChildren().get(i).rect.setFill(Color.web("#dddddd"));
 			}
 		}
 	}
 
 	public void nextStep() {
 		if (nextTree != null) {
+			if (nextTree.isLeaf()) return;
 			double tmpX = this.mousePos.get(mousePos.size()-1).getEndX();
 			double tmpY = this.mousePos.get(mousePos.size()-1).getEndY();
 
@@ -84,14 +107,8 @@ public class UI {
 			this.mousePos.get(mousePos.size()-1).setEndY(nextTree.centerY);
 			this.addPoint(nextTree.centerX,nextTree.centerY);
 			reveilNode(nextTree, nextTree.centerX,nextTree.centerY);
-			
-			if (nextTree.isLeaf()) {
-				nextTree.rect.setStroke(Color.ORANGE);
-			}
-			
 			currentTree = nextTree;
 			updateLines(tmpX, tmpY);
-			this.refreshCd();
 		}
 	}
 
@@ -111,52 +128,71 @@ public class UI {
 
 	public Tree<String> generateTree() {
 		Tree<String> tree = new Tree<String>("", root);
-		Tree<String> childNode1 = new Tree<String>("tools", tree, root);
-		Tree<String> childNode2 = new Tree<String>("weapons", tree, root);
-		Tree<String> childNode3 = new Tree<String>("spells", tree, root);
-		Tree<String> childNode4 = new Tree<String>("menu", tree, root);
+		Tree<String> childNode1 = new Tree<String>("Add Mesh", tree, root);
+		Tree<String> childNode2 = new Tree<String>("Selection", tree, root);
+		Tree<String> childNode3 = new Tree<String>("Animation", tree, root);
+		Tree<String> childNode4 = new Tree<String>("Apply", tree, root);
+		Tree<String> childNode5 = new Tree<String>("Clear", tree, root);
+		Tree<String> childNode6 = new Tree<String>("View", tree, root);
+		Tree<String> childNode7 = new Tree<String>("Transform", tree, root);
 
 
-		Tree<String> childNode11 = new Tree<String>("pickaxe", childNode1, root);
-		Tree<String> childNode12 = new Tree<String>("hammer", childNode1, root);
-		Tree<String> childNode13 = new Tree<String>("shovel", childNode1, root);
+		Tree<String> childNode11 = new Tree<String>("Lamp", childNode1, root);
+		Tree<String> childNode12 = new Tree<String>("Mesh", childNode1, root);
+		Tree<String> childNode13 = new Tree<String>("Curve", childNode1, root);
+		
+		Tree<String> childNode121 = new Tree<String>("Cube", childNode12, root);
+		Tree<String> childNode132 = new Tree<String>("UV Sphere", childNode12, root);
+		
+		
+		Tree<String> childNode21 = new Tree<String>("Inverse", childNode2, root);
+		Tree<String> childNode22 = new Tree<String>("(De)select All", childNode2, root);
+		
+		
+		Tree<String> childNode61 = new Tree<String>("Top", childNode6, root);
+		Tree<String> childNode62 = new Tree<String>("Align View", childNode6, root);
+		Tree<String> childNode63 = new Tree<String>("Right", childNode6, root);
+		
+		Tree<String> childNode621 = new Tree<String>("Center Cursor", childNode62, root);
+		Tree<String> childNode622 = new Tree<String>("View Lock To Active", childNode62, root);
+		Tree<String> childNode623 = new Tree<String>("View Selected", childNode62, root);
 
 		return tree;
 	}
-	
+
 	public void refreshCd() {
 		if (cd!=null) cd.stop();
 		cd = new Countdown(this);
 	}
-	
+
 	class Countdown {
 
-    	double cd;
-    	UI ui;
-    	private AnimationTimer anim;
-    	
-    	public Countdown(UI ui) {
-    		this.ui=ui;
-    		start();
-    	}
-    	
-    	public void stop () {
-    		anim.stop();
-    	}
-    	
-    	public void start () {
-    		cd = 60/2;
-    		anim = new AnimationTimer() {
-    			public void handle(long arg0) {
-    				cd--;
-    				if (cd < 0) {
-    					ui.nextStep();
-    					this.stop();
-    				}
-    			}
-    		};
-    		anim.start();
-    	}
-    }
+		double cd;
+		UI ui;
+		private AnimationTimer anim;
+
+		public Countdown(UI ui) {
+			this.ui=ui;
+			start();
+		}
+
+		public void stop () {
+			anim.stop();
+		}
+
+		public void start () {
+			cd = 60/2;
+			anim = new AnimationTimer() {
+				public void handle(long arg0) {
+					cd--;
+					if (cd < 0) {
+						ui.nextStep();
+						this.stop();
+					}
+				}
+			};
+			anim.start();
+		}
+	}
 
 }
