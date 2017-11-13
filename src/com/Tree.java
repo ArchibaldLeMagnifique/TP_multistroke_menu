@@ -1,9 +1,15 @@
 package com;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import com.sun.javafx.collections.TrackableObservableList;
+import com.sun.javafx.collections.VetoableListDecorator;
+
+import javafx.collections.ObservableList;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -15,7 +21,9 @@ public class Tree<T> {
 	public List<Tree<T>> children = new ArrayList<Tree<T>>();
 	public Tree<T> parent = null;
 	public T data = null;
-
+	public ArrayList<Node> properChildren = new ArrayList<Node>();
+	
+	
 	boolean visible;
 
 	Group root;
@@ -58,6 +66,17 @@ public class Tree<T> {
 
 	}
 
+	public void effaceChildren(Tree node) {
+		Iterator it = properChildren.iterator();
+		
+		while(it.hasNext())
+		{
+			Node currNode = (Node) it.next();
+			root.getChildren().remove(currNode);
+		}
+
+	}
+	
 	public void dessine(double X, double Y, double posX, double posY) {
 		this.centerX = posX; this.centerY = posY;
 		if (isRoot()) {
@@ -87,7 +106,11 @@ public class Tree<T> {
 			root.getChildren().add(l);
 			root.getChildren().add(rect);
 			root.getChildren().add(t);
-
+			this.properChildren.add(l);
+			this.properChildren.add(rect);
+			this.properChildren.add(t);
+			
+			
 			this.visible=true;
 		}
 
