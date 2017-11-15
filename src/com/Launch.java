@@ -11,6 +11,8 @@ import javafx.stage.Stage;
 public class Launch extends Application {
 
 	Tree<String> tree;
+	
+	String clickPressed = null;
 
 	UI ui;
 
@@ -22,6 +24,10 @@ public class Launch extends Application {
 
 		ui.scene.setOnMousePressed(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent e) {
+				if (clickPressed != null) return;
+				clickPressed = e.getButton().toString();
+				
+				ui.mode = e.getButton().toString();
 				tree.dessine(0, 0, e.getSceneX(), e.getSceneY());
 				ui.reveilNode(tree, e.getSceneX(), e.getSceneY());
 				ui.addPoint(e.getSceneX(), e.getSceneY());
@@ -31,6 +37,9 @@ public class Launch extends Application {
 
 		ui.scene.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent e) {
+				if (e.getButton().toString() != clickPressed) return;
+				clickPressed = null;
+				
 				if (ui.nextTree!=null){
 					if (ui.nextTree.isLeaf()) {
 						Tree<String> current = ui.nextTree;
@@ -42,7 +51,6 @@ public class Launch extends Application {
 						ui.result.setText("Result:"+s);
 					}
 				}
-				ui.endortNode(tree);
 				ui.root.getChildren().clear();
 				ui.root.getChildren().add(ui.result);
 				if (ui.cd != null) ui.cd.stop();
